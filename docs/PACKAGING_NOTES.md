@@ -51,6 +51,69 @@ diện riêng của nonlaOS, nên không còn nằm trong nhóm warning
 `kcm-fcitx5` không có candidate installable, nên đưa vào `Depends` sẽ làm
 metapackage không cài được dù input method core vẫn có.
 
+## Trạng Thái Version Của Toolchain Packaging
+
+Phần này ghi lại kết quả kiểm chứng thực tế khi rà soát "nâng mọi thứ lên bản
+mới nhất", để lần sau không phải kiểm tra lại từ đầu.
+
+### Đã nâng
+
+- `Standards-Version: 4.7.0` -> `4.7.2`.
+
+`4.7.2` là bản Debian Policy trong Debian stable/trixie, đúng với base distro mà
+repo đang nhắm tới. Các yêu cầu mới giữa `4.7.0` và `4.7.2` đã được kiểm tra
+trên package hiện tại và không có vi phạm:
+
+- Policy 4.7.1 (merged-usr): không package nào ship file vào `/bin`, `/lib`,
+  `/sbin`.
+- Policy 4.7.1 / 4.7.2 (`/usr/games`): không package nào ship file vào
+  `/usr/games`.
+- Policy 4.7.1 (`/usr/share/man`, `/usr/share/info`, locale): không package nào
+  phụ thuộc runtime vào các đường dẫn này.
+
+Ngoài ra repo chưa có maintainer script, init script hay systemd unit nào, nên
+yêu cầu về systemd unit của Policy 4.7.0 cũng không áp dụng.
+
+### Không nâng, kèm lý do đã kiểm chứng
+
+- `debhelper-compat (= 13)`: **giữ nguyên 13**.
+
+  Compat 14 và 15 vẫn đang ở trạng thái "open for development; use with
+  caution" theo `debhelper-compat-upgrade-checklist(7)`. Quan trọng hơn, gói
+  `debhelper` chỉ `Provides` compat tới `13`, nên khai báo `debhelper-compat
+  (= 14)` làm `dpkg-checkbuilddeps` báo `Unmet build dependencies` và build
+  fail ngay. Compat 13 hiện vẫn là "the recommended mode of operation".
+
+- `Standards-Version` lên `4.7.3` / `4.7.4`: **giữ ở 4.7.2**.
+
+  Lý do chính: khuyến nghị của Policy 4.7.3 là bỏ `Priority` khỏi source
+  stanza, nhưng thử nghiệm thực tế cho thấy trên toolchain hiện tại việc bỏ
+  `Priority` làm binary package mất luôn field `Priority` và sinh warning
+  `recommended-field ... Priority`. Đây là regression thật nên không áp dụng.
+
+  Bối cảnh thêm: hai bản này mới chỉ có trong forky/sid, chưa vào
+  stable/trixie. Riêng điểm này không phải lý do chặn, vì `Standards-Version`
+  là khai báo mức tuân thủ Policy chứ không phải build dependency.
+
+- `actions/checkout` và `actions/upload-artifact`: **giữ `@v7`**.
+
+  Đã kiểm tra release mới nhất trên GitHub: cả hai đang ở `v7.0.1`, tức major
+  tag `v7` đã là mới nhất.
+
+- Thêm `package-ecosystem: "docker"` vào `.github/dependabot.yml` để theo dõi
+  image `debian:trixie`: **không thêm**.
+
+  Dependabot chỉ nhận diện image trong `Dockerfile`, Docker Compose, Kubernetes
+  manifest và Helm values. Image trong workflow này nằm trong một lệnh
+  `docker run` bên trong block `run:`, nên Dependabot không quét được. Thêm
+  entry này sẽ tạo config chết mà không sinh update nào.
+
+- Base distro `trixie`: **giữ nguyên**.
+
+  `trixie` vẫn là Debian stable hiện tại. `forky` mới ở trạng thái testing và dự
+  kiến phát hành năm 2027, nên chưa phải "bản mới nhất" hợp lý cho một distro
+  hướng tới người dùng cuối.
+
 ## Lintian overrides
 
 `nonla-default-settings` override tag `package-contains-file-in-etc-skel` cho

@@ -3,7 +3,7 @@ Section: misc
 Priority: optional
 Maintainer: Le Hung Quang Minh <nonlaproject@users.noreply.github.com>
 Build-Depends: debhelper-compat (= 13)
-Standards-Version: 4.7.0
+Standards-Version: 4.7.2
 Rules-Requires-Root: no
 
 Package: nonla-calamares-config
