@@ -86,7 +86,8 @@
 - [ ] Kiểm tra `/usr/share/pixmaps/nonlaos.png`.
 - [ ] Kiểm tra `/usr/share/icons/hicolor/256x256/apps/nonlaos.png`.
 - [ ] Dry-run cài `nonla-desktop` và xác nhận kéo `nonla-branding`,
-  `nonla-look`, `nonla-default-settings`, `nonla-calamares-config`.
+  `nonla-look`, `nonla-default-settings`, `nonla-calamares-config`,
+  `nonla-repo-keyring`, `nonla-apt-source`.
 
 ## APT Repository Checklist
 
@@ -108,6 +109,34 @@
   `/usr/share/keyrings/nonla-archive-keyring.gpg`.
 - [ ] APT đọc được repo local qua `file://`.
 - [ ] `apt-cache policy nonla-desktop` thấy package từ repo local.
+
+## APT Source Checklist
+
+- [ ] Build mặc định `./tools/build-packages.sh` tạo
+  `nonla-apt-source_*.deb`.
+- [ ] Entry mặc định có `Enabled: no` và URI placeholder
+  `https://REPLACE-WITH-NONLA-REPO-URI.invalid/nonlaos`.
+- [ ] `apt update` không báo lỗi khi chỉ có entry placeholder disabled.
+- [ ] Build với `NONLA_REPO_URI=...` tạo entry `Enabled: yes` đúng URI.
+- [ ] Generator từ chối scheme không hợp lệ như `ftp://`.
+- [ ] Generator từ chối URI chứa ký tự ngoài whitelist `A-Za-z0-9:/._~%+-`,
+  gồm `|`, `&`, `\`, khoảng trắng, tab và newline.
+- [ ] Generator từ chối `NONLA_REPO_SUITE`, `NONLA_REPO_COMPONENT`,
+  `NONLA_REPO_ARCH` rỗng.
+- [ ] Generator báo lỗi rõ khi thiếu tham số hoặc template không tồn tại.
+- [ ] `nonla-apt-source` ship đúng `/etc/apt/sources.list.d/nonla.sources`.
+- [ ] Entry có `Signed-By: /usr/share/keyrings/nonla-archive-keyring.gpg`.
+- [ ] `nonla-apt-source` `Depends` trên `nonla-repo-keyring`.
+- [ ] `nonla-desktop` `Depends` trên `nonla-repo-keyring` và
+  `nonla-apt-source`.
+- [ ] Với repo đã ký, `apt update` verify chữ ký thành công qua entry này.
+- [ ] `apt-cache policy nonla-desktop` thấy package qua entry này.
+- [ ] `apt update` từ chối repo ký bằng key khác, chứng minh `Signed-By` có
+  hiệu lực.
+- [ ] `tools/build-packages.sh` in dòng `Verified Signed-By ...`.
+- [ ] Đổi `Signed-By` sang tên keyring sai thì build fail.
+- [ ] Upgrade khi conffile chưa bị sửa: entry được cập nhật theo build mới.
+- [ ] Upgrade khi conffile đã bị admin sửa: giá trị của admin được giữ.
 
 ## CI ISO Checklist
 

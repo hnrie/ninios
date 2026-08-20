@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+TEMPLATE = payload/etc/apt/sources.list.d/nonla.sources.in
+GENERATED = debian/generated/etc/apt/sources.list.d/nonla.sources
+
+# tools/build-packages.sh normalises payload permissions to 0644, so the
+# generator is invoked through sh instead of relying on its executable bit.
+%:
+	dh $@
+
+override_dh_auto_build:
+	sh debian/generate-apt-source $(TEMPLATE) $(GENERATED)
+
+override_dh_auto_clean:
+	rm -rf debian/generated

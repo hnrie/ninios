@@ -1,0 +1,86 @@
+#!/bin/sh
+# Render the nonlaOS deb822 APT source entry from its template.
+#
+# The public repository URI is intentionally not stored in the source tree, so
+# it is supplied at build time through NONLA_REPO_URI. When no URI is given the
+# generated entry keeps an obvious placeholder and stays disabled, which APT
+# ignores instead of failing "apt update".
+set -eu
+
+if [ "$#" -ne 2 ]; then
+    echo "usage: $0 <template> <output>" >&2
+    exit 2
+fi
+
+TEMPLATE="$1"
+OUTPUT="$2"
+
+if [ ! -f "${TEMPLATE}" ]; then
+    echo "Template not found: ${TEMPLATE}" >&2
+    exit 1
+fi
+
+PLACEHOLDER_URI="https://REPLACE-WITH-NONLA-REPO-URI.invalid/nonlaos"
+
+repo_uri="${NONLA_REPO_URI:-}"
+repo_suite="${NONLA_REPO_SUITE:-stable}"
+repo_component="${NONLA_REPO_COMPONENT:-main}"
+repo_arch="${NONLA_REPO_ARCH:-amd64}"
+
+# Values are substituted into a deb822 stanza with sed, so anything outside a
+# conservative URI/field character set is rejected. A whitelist is used instead
+# of a blacklist because newlines would otherwise inject extra deb822 fields,
+# and '|', '&' and '\' would corrupt the sed replacement itself.
+require_safe() {
+    name="$1"
+    value="$2"
+
+    if [ -z "${value}" ]; then
+        echo "${name} must not be empty" >&2
+        exit 1
+    fi
+
+    case "${value}" in
+        *[!A-Za-z0-9:/._~%+-]*)
+            echo "${name} contains an unsupported character: ${value}" >&2
+            exit 1
+            ;;
+    esac
+}
+
+if [ -z "${repo_uri}" ]; then
+    repo_uri="${PLACEHOLDER_URI}"
+    repo_enabled="no"
+    echo "NONLA_REPO_URI is not set; generating a disabled placeholder APT source." >&2
+else
+    case "${repo_uri}" in
+        http://* | https://* | file:/*) ;;
+        *)
+            echo "NONLA_REPO_URI must start with http://, https:// or file:/ : ${repo_uri}" >&2
+            exit 1
+            ;;
+    esac
+    repo_enabled="yes"
+fi
+
+require_safe NONLA_REPO_URI "${repo_uri}"
+require_safe NONLA_REPO_SUITE "${repo_suite}"
+require_safe NONLA_REPO_COMPONENT "${repo_component}"
+require_safe NONLA_REPO_ARCH "${repo_arch}"
+
+mkdir -p "$(dirname "${OUTPUT}")"
+
+sed \
+    -e "s|@NONLA_REPO_URI@|${repo_uri}|g" \
+    -e "s|@NONLA_REPO_SUITE@|${repo_suite}|g" \
+    -e "s|@NONLA_REPO_COMPONENT@|${repo_component}|g" \
+    -e "s|@NONLA_REPO_ARCH@|${repo_arch}|g" \
+    -e "s|@NONLA_REPO_ENABLED@|${repo_enabled}|g" \
+    "${TEMPLATE}" > "${OUTPUT}"
+
+if grep -q '@NONLA_REPO_' "${OUTPUT}"; then
+    echo "Unsubstituted placeholder left in ${OUTPUT}" >&2
+    exit 1
+fi
+
+echo "Generated ${OUTPUT} (Enabled: ${repo_enabled})"

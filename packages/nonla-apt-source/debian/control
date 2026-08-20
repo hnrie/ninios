@@ -1,0 +1,20 @@
+Source: nonla-apt-source
+Section: misc
+Priority: optional
+Maintainer: Le Hung Quang Minh <nonlaproject@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+
+Package: nonla-apt-source
+Architecture: all
+Depends:
+ ${misc:Depends},
+ nonla-repo-keyring
+Description: nonlaOS APT repository source entry
+ Installs the deb822 APT source entry used to fetch nonlaOS packages and
+ updates from the official nonlaOS repository.
+ .
+ The repository URI is supplied at build time so the public domain is not
+ hardcoded in the source tree. Builds without a configured URI ship a disabled
+ placeholder entry that APT ignores until an administrator fills it in.

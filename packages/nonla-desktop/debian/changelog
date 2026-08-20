@@ -1,5 +1,7 @@
 nonla-desktop (0.1.0) unstable; urgency=medium
 
   * Initial nonlaOS desktop metapackage.
+  * Pull in nonla-repo-keyring and nonla-apt-source so installed systems can
+    verify and fetch nonlaOS updates over APT.
 
  -- Le Hung Quang Minh <nonlaproject@users.noreply.github.com>  Mon, 29 Jun 2026 00:00:00 +0700

@@ -46,6 +46,9 @@ các warning này phải biến mất thay vì bị ignore lâu dài.
 diện riêng của nonlaOS, nên không còn nằm trong nhóm warning
 `empty-binary-package`.
 
+`nonla-apt-source` có payload sinh lúc build nên cũng không nằm trong nhóm
+warning `empty-binary-package`.
+
 `nonla-desktop` giữ `fcitx5` và `fcitx5-unikey` trong `Depends`, nhưng đặt
 `kcm-fcitx5` trong `Recommends`. Lý do: trên môi trường Debian/WSL hiện tại,
 `kcm-fcitx5` không có candidate installable, nên đưa vào `Depends` sẽ làm
@@ -129,3 +132,66 @@ live user thường được tạo trong quá trình boot bởi `live-config`, n
 chroot của live-build có thể chạy quá sớm khi `/home/user` chưa tồn tại.
 Component này chỉ chạy trong môi trường live, sau bước `user-setup`, để copy
 `/etc/skel` vào live home đúng thời điểm.
+
+## APT source sinh lúc build
+
+`nonla-apt-source` không commit file `nonla.sources` hoàn chỉnh. Thay vào đó
+repo giữ template `payload/etc/apt/sources.list.d/nonla.sources.in` và render
+nó trong `override_dh_auto_build` bằng `debian/generate-apt-source`.
+
+Lý do: README yêu cầu không hardcode domain public của nonlaOS trong source,
+nhưng hệ thống đã cài vẫn cần một entry APT thật để nhận update.
+
+Hành vi của generator:
+
+- Có `NONLA_REPO_URI`: render URI đó và đặt `Enabled: yes`.
+- Không có `NONLA_REPO_URI`: render placeholder
+  `https://REPLACE-WITH-NONLA-REPO-URI.invalid/nonlaos` và đặt `Enabled: no`.
+
+Chọn `Enabled: no` thay vì bỏ hẳn file, vì đã kiểm chứng thực tế: APT đọc entry
+`Enabled: no` mà không phát sinh lỗi, còn placeholder với `Enabled: yes` làm
+`apt update` báo `Could not resolve`. Cách này giữ file ở đúng vị trí để admin
+sửa, mà không làm hỏng `apt update` của build không cấu hình URI.
+
+Generator từ chối URI có scheme ngoài `http://`, `https://`, `file:/`. Ngoài
+ra mọi giá trị đưa vào template phải khớp whitelist ký tự
+`A-Za-z0-9:/._~%+-`.
+
+Dùng whitelist thay vì blacklist là có chủ đích. Bản blacklist đầu tiên chặn
+`|`, `&`, `\`, khoảng trắng nhưng vẫn để lọt newline, và một URI chứa newline
+có thể chèn thêm field deb822 vào stanza sinh ra. Whitelist chặn luôn newline,
+tab và các metacharacter shell/sed.
+
+`debian/generate-apt-source` được gọi qua `sh <script>` chứ không dựa vào bit
+executable, vì `tools/build-packages.sh` normalize toàn bộ file trong package
+về `0644` trước khi build và chỉ `chmod 0755` riêng `debian/rules`.
+
+File `/etc/apt/sources.list.d/nonla.sources` được dpkg đăng ký là conffile.
+Hành vi này đã được kiểm chứng bằng `dpkg -i` thật trên rootfs tạm:
+
+- Conffile chưa bị sửa: build mới ghi đè được, kể cả khi version không đổi.
+  dpkg so sánh nội dung chứ không so version, nên một build có URI thật vẫn
+  thay được entry placeholder đã cài trước đó.
+- Conffile đã bị admin sửa: dpkg giữ nguyên giá trị của admin.
+
+### Guard Signed-By trong build
+
+`tools/build-packages.sh` kiểm tra sau khi build: đường dẫn `Signed-By` trong
+`nonla-apt-source` phải là file mà `nonla-repo-keyring` thật sự ship. Sai tên
+keyring sẽ làm `apt update` hỏng trên mọi máy người dùng, mà entry mặc định
+`Enabled: no` thì không phát hiện được vì APT bỏ qua stanza disabled.
+
+Guard này fail build khi lệch, và đã được kiểm chứng bằng cách cố tình đổi
+`Signed-By` sang tên sai.
+
+### Việc còn lại cho pipeline ISO
+
+`tools/build-iso.sh` hiện gọi `./tools/build-packages.sh` mà không truyền
+`NONLA_REPO_URI`. Nghĩa là ISO build từ CI hiện tại vẫn ship entry placeholder
+`Enabled: no`, và máy cài từ ISO đó chưa tự nhận update cho tới khi admin sửa
+file.
+
+Đây là giới hạn có chủ ý ở phạm vi thay đổi này, vì AGENTS.md yêu cầu không mở
+rộng scope sang ISO/live-build khi task chỉ nằm ở mức package. Bước tiếp theo
+để đóng vòng lặp update là truyền URI repo thật vào ISO workflow từ GitHub
+secret/variable, thay vì commit domain vào source.

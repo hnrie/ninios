@@ -1,0 +1,7 @@
+Types: deb
+URIs: @NONLA_REPO_URI@
+Suites: @NONLA_REPO_SUITE@
+Components: @NONLA_REPO_COMPONENT@
+Architectures: @NONLA_REPO_ARCH@
+Signed-By: /usr/share/keyrings/nonla-archive-keyring.gpg
+Enabled: @NONLA_REPO_ENABLED@

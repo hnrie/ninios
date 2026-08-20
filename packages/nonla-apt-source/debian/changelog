@@ -1,0 +1,6 @@
+nonla-apt-source (0.1.0) unstable; urgency=medium
+
+  * Ship the nonlaOS APT repository source entry so installed systems can
+    receive package updates from the official repository.
+
+ -- Le Hung Quang Minh <nonlaproject@users.noreply.github.com>  Mon, 29 Jun 2026 00:00:00 +0700

@@ -58,6 +58,9 @@ artwork/    artwork source sau này
 - `nonla-calamares-config`: cấu hình Calamares ban đầu, branding installer
   nonlaOS và launcher `Install nonlaOS` cho live session.
 - `nonla-repo-keyring`: public archive key để verify APT repo nonlaOS.
+- `nonla-apt-source`: APT source entry `/etc/apt/sources.list.d/nonla.sources`
+  để hệ đã cài nhận update từ repo nonlaOS. URI repo được truyền lúc build qua
+  `NONLA_REPO_URI`, không hardcode domain trong source.
 
 ## Build packages
 
@@ -114,6 +117,33 @@ deb [signed-by=/usr/share/keyrings/nonla-archive-keyring.gpg] https://YOUR_EXIST
 ```
 
 Domain thật được cấu hình ở hạ tầng deploy. Domain riêng cho nonlaOS xử lý sau.
+
+## APT source trên hệ đã cài
+
+`nonla-apt-source` ship entry deb822 để máy đã cài nhận update từ repo nonlaOS:
+
+```text
+/etc/apt/sources.list.d/nonla.sources
+```
+
+Entry này verify bằng keyring của `nonla-repo-keyring` qua `Signed-By`, và
+`nonla-desktop` kéo cả hai package.
+
+Vì README yêu cầu không hardcode domain public trong source, URI repo được
+truyền lúc build:
+
+```bash
+NONLA_REPO_URI=https://YOUR_EXISTING_REPO_DOMAIN/path/to/repo \
+  ./tools/build-packages.sh
+```
+
+Nếu build không có `NONLA_REPO_URI`, package vẫn build được nhưng entry sinh ra
+là placeholder và mang `Enabled: no`, nên `apt update` bỏ qua thay vì báo lỗi
+domain không tồn tại.
+
+Biến build khác: `NONLA_REPO_SUITE` (mặc định `stable`),
+`NONLA_REPO_COMPONENT` (mặc định `main`), `NONLA_REPO_ARCH` (mặc định `amd64`).
+Các giá trị này khớp mặc định của `tools/make-repo.sh`.
 
 ## Archive signing key
 
