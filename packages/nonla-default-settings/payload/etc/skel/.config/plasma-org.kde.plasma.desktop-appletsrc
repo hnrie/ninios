@@ -42,6 +42,9 @@ icon=nonlaos
 immutability=1
 plugin=org.kde.plasma.icontasks
 
+[Containments][2][Applets][4][Configuration][General]
+launchers=applications:firefox-esr.desktop,applications:org.kde.dolphin.desktop,applications:org.kde.konsole.desktop
+
 [Containments][2][Applets][5]
 immutability=1
 plugin=org.kde.plasma.marginsseparator

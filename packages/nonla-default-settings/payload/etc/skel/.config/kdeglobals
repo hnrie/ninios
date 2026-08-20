@@ -1,4 +1,5 @@
 [General]
+BrowserApplication=firefox-esr.desktop
 ColorScheme=Nonla
 Name=Nonla
 

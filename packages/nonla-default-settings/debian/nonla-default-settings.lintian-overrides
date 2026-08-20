@@ -7,6 +7,7 @@ nonla-default-settings: package-contains-file-in-etc-skel [etc/skel/.config/fast
 nonla-default-settings: package-contains-file-in-etc-skel [etc/skel/.config/fastfetch/config.jsonc]
 nonla-default-settings: package-contains-file-in-etc-skel [etc/skel/.config/kdeglobals]
 nonla-default-settings: package-contains-file-in-etc-skel [etc/skel/.config/kscreenlockerrc]
+nonla-default-settings: package-contains-file-in-etc-skel [etc/skel/.config/mimeapps.list]
 nonla-default-settings: package-contains-file-in-etc-skel [etc/skel/.config/neofetch/]
 nonla-default-settings: package-contains-file-in-etc-skel [etc/skel/.config/neofetch/config.conf]
 nonla-default-settings: package-contains-file-in-etc-skel [etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc]

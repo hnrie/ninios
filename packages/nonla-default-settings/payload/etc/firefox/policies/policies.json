@@ -1,0 +1,6 @@
+{
+  "policies": {
+    "RequestedLocales": ["vi", "en-US"],
+    "DontCheckDefaultBrowser": true
+  }
+}

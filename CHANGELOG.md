@@ -12,3 +12,5 @@ chưa có release chính thức.
 - Thêm payload nhận diện đầu tiên cho `nonla-look`.
 - Nâng `Standards-Version` lên `4.7.2` cho toàn bộ package và ghi lại trạng
   thái version của toolchain packaging trong `docs/PACKAGING_NOTES.md`.
+- Hoàn thiện Firefox mặc định: kéo `firefox-esr-l10n-vi`, seed policy tiếng Việt
+  toàn hệ thống, đặt Firefox làm trình duyệt mặc định và ghim vào panel.

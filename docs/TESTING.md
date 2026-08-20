@@ -28,6 +28,9 @@
 - [ ] Gõ tiếng Việt.
 - [ ] LibreOffice mở và tạo tài liệu được.
 - [ ] Firefox mở web được.
+- [ ] Firefox hiển thị giao diện tiếng Việt.
+- [ ] Firefox không hỏi "đặt làm trình duyệt mặc định" khi mở lần đầu.
+- [ ] Bấm link trong app khác mở bằng Firefox.
 - [ ] USB.
 - [ ] Audio.
 - [ ] Wi-Fi.
@@ -49,6 +52,10 @@
 - [ ] Wallpaper nonla được áp dụng.
 - [ ] Color scheme `Nonla` được áp dụng.
 - [ ] Panel Plasma cơ bản xuất hiện và launcher dùng icon `nonlaos`.
+- [ ] Panel có sẵn Firefox, Dolphin và Konsole được ghim.
+- [ ] `/etc/firefox/policies/policies.json` tồn tại.
+- [ ] `about:policies` trong Firefox hiển thị `RequestedLocales` là `vi`.
+- [ ] `xdg-settings get default-web-browser` trả về `firefox-esr.desktop`.
 - [ ] `fcitx5` chạy sau khi login.
 - [ ] Gõ tiếng Việt được bằng FCITX5 Unikey.
 - [ ] User đã tồn tại trước đó không bị ghi đè cấu hình.

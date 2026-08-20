@@ -114,6 +114,37 @@ yêu cầu về systemd unit của Policy 4.7.0 cũng không áp dụng.
   kiến phát hành năm 2027, nên chưa phải "bản mới nhất" hợp lý cho một distro
   hướng tới người dùng cuối.
 
+## Firefox Policy Và Trình Duyệt Mặc Định
+
+`nonla-default-settings` ship policy Firefox tại
+`/etc/firefox/policies/policies.json`, không phải `/etc/firefox-esr/policies`.
+
+Lý do: `firefox-esr` của Debian tạo config dir `/etc/firefox-esr` nhưng runtime
+lại đọc policy từ `/etc/firefox/policies/policies.json`. Đây là hành vi được ghi
+nhận trên Debian Wiki và trong bug `#979821`, tới nay vẫn chưa đổi. Ship vào
+`/etc/firefox-esr/policies` sẽ tạo file chết không có tác dụng.
+
+Policy hiện chỉ đặt hai key:
+
+- `RequestedLocales`: ưu tiên `vi`, fallback `en-US`. Cần
+  `firefox-esr-l10n-vi` (đã nằm trong `Depends` của `nonla-desktop`) thì locale
+  `vi` mới thực sự có sẵn.
+- `DontCheckDefaultBrowser`: tắt prompt "đặt làm trình duyệt mặc định", vì
+  distro đã đặt sẵn Firefox là mặc định.
+
+Không đặt `DisableAppUpdate` vì `firefox-esr` trên Debian vốn đã cập nhật qua
+APT, không có bộ updater riêng để tắt. Không đặt `DisableTelemetry` vì đây là
+lựa chọn chính sách người dùng, nên để mặc định upstream thay vì ghi cứng trong
+package settings.
+
+Trình duyệt mặc định được đặt ở hai lớp trong `/etc/skel`:
+
+- `.config/mimeapps.list` cho lớp XDG (`xdg-open`, app GTK).
+- Khóa `BrowserApplication` trong `.config/kdeglobals` cho lớp KDE.
+
+Cần cả hai vì KDE đọc `BrowserApplication` trước, còn app ngoài KDE chỉ nhìn
+`mimeapps.list`.
+
 ## Lintian overrides
 
 `nonla-default-settings` override tag `package-contains-file-in-etc-skel` cho
