@@ -1,5 +1,6 @@
 nonla-desktop (0.1.0) unstable; urgency=medium
 
   * Initial nonlaOS desktop metapackage.
+  * Pull firefox-esr-l10n-vi so Firefox ships with a Vietnamese interface.
 
  -- Le Hung Quang Minh <nonlaproject@users.noreply.github.com>  Mon, 29 Jun 2026 00:00:00 +0700

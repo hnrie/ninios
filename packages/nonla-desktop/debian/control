@@ -19,6 +19,7 @@ Depends:
  calamares,
  plymouth,
  firefox-esr,
+ firefox-esr-l10n-vi,
  libreoffice,
  dolphin,
  konsole,

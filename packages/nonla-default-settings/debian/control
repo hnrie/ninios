@@ -9,6 +9,7 @@ Rules-Requires-Root: no
 Package: nonla-default-settings
 Architecture: all
 Depends: ${misc:Depends}, fcitx5, fcitx5-unikey
-Recommends: nonla-look
+Recommends: nonla-look, firefox-esr
 Description: nonlaOS default settings
- Provides default KDE Plasma and input method settings for new nonlaOS users.
+ Provides default KDE Plasma, browser and input method settings for new nonlaOS
+ users.

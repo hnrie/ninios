@@ -1,3 +1,4 @@
 payload/etc/skel etc/
 payload/etc/environment.d etc/
+payload/etc/firefox etc/
 payload/usr/lib usr/
